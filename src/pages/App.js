@@ -3,6 +3,7 @@ import * as tf from '@tensorflow/tfjs';
 import './App.css'; // Impor file CSS di sini
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { marked } from 'marked';
+import { Link } from 'react-router-dom';
 
 const API_KEY = 'AIzaSyAvtn3iiv_jbb8hGaebF7W9TH3BFuMe4-U'; // Ganti dengan API Key Anda
 const MODEL_NAME = 'gemini-pro'; // Nama model yang sesuai
@@ -134,7 +135,7 @@ const App = () => {
     <div>
       <header>
         <nav>
-          <a href="/chat" className="bg-radius no-underline" >Chat</a>
+          <Link to="/chat" className="bg-radius no-underline" >Chat</Link>
           <button onClick={connectToDevice} className="bg-radius b-view">Connect to Device</button>
         </nav>
       </header>

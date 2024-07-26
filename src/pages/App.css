@@ -11,6 +11,10 @@
     --creamrgb: rgb(255, 255, 255);
 }
 
+header{
+    margin-top: -4%;
+}
+
 body {
     font-family: "Poppins";
     background-color: var(--cream);
@@ -18,9 +22,15 @@ body {
 }
 
 .chat-nav{
+    z-index: 999;
+    position: fixed;
     text-decoration: none;
     background-color: #c6e3fa;
     color: #7b8d9b;
+    top: 3%;
+    left: 1%;
+    border-radius: 10px;
+    padding: 10px 15px;
 }
 
 .no-underline {
