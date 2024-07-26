@@ -116,7 +116,7 @@ const App = () => {
     <div>
       <header></header>
       <main>
-        <button onClick={connectToDevice} class="bg-radius" >Connect to Device</button>
+        <button onClick={connectToDevice} class="bg-radius b-view" >Connect to Device</button>
           <article class="d-flex no-wrap" id="iot-value">
               <section class="d-flex card-iot">
                   <div class="circles">

@@ -13,16 +13,24 @@ import { GoogleGenerativeAI } from "@google/generative-ai"; // Sesuaikan dengan 
 function Chat() {
   const [userInput, setUserInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const handleUserInput = (value) => {
     setUserInput(value);
   };
 
   const genAI = new GoogleGenerativeAI("AIzaSyAvtn3iiv_jbb8hGaebF7W9TH3BFuMe4-U");
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
   const sendMessage = async (messageText) => {
     if (messageText.trim() === "") return;
+
+    setChatHistory((prev) => [
+      ...prev,
+      { type: "user", message: messageText },
+    ]);
+    setUserInput("");
+    setLoading(true);
 
     console.log("Sending message:", messageText);
 
@@ -51,20 +59,20 @@ function Chat() {
       const response = result.response;
       console.log("Response:", response);
 
-      const text = response.candidates && response.candidates.length > 0
-        ? response.candidates[0].text
-        : "No response text available.";
+      let text = "No response text available.";
+
+      text = response.text();
 
       console.log("Response text:", text);
 
       setChatHistory((prev) => [
         ...prev,
-        { type: "user", message: messageText },
         { type: "bot", message: text },
       ]);
-      setUserInput("");
     } catch (e) {
       console.error("Error occurred while fetching", e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,13 +85,23 @@ function Chat() {
               <Message
                 key={i}
                 model={{
-                  message: elt.message.toString(),
+                  message: elt.message ? elt.message.toString() : "Invalid message",
                   sender: elt.type,
                   sentTime: "just now",
                   direction: elt.type === "user" ? "outgoing" : "incoming",
                 }}
               />
             ))}
+            {loading && (
+              <Message
+                model={{
+                  message: "Loading...",
+                  sender: "bot",
+                  sentTime: "just now",
+                  direction: "incoming",
+                }}
+              />
+            )}
           </MessageList>
           <MessageInput
             placeholder="Type message here"

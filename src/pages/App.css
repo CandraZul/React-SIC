@@ -17,14 +17,24 @@ body {
     /* background: linear-gradient(to bottom right, var(--cream), #DAE4FF, var(--cream), #EADAFF, #F3E3EF, var(--cream)); */
 }
 
+.b-view {
+    background: linear-gradient(to right, var(--biru), var(--ungu));
+    text-transform: uppercase;
+    margin-top: 5%; 
+    margin-left: 5%;
+    font-weight: bold;
+    color: white;
+    border: none;
+}
+
 .bg-white {
     background-color: var(--cream);
 }
 
 article {
     background-color: var(--creamrgb);
-    padding: 5%;
-    margin-top: 5%;
+    padding: 3%;
+    margin-top: 2%;
     margin-left: 5%;
     margin-right: 5%;
     border-radius: 50px;
