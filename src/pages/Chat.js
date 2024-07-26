@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
 import {
   MainContainer,
@@ -10,21 +10,51 @@ import {
 import './App.css'; // Impor file CSS di sini
 import { GoogleGenerativeAI } from "@google/generative-ai"; // Sesuaikan dengan nama package yang benar
 
+const genAI = new GoogleGenerativeAI("AIzaSyAvtn3iiv_jbb8hGaebF7W9TH3BFuMe4-U");
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
 function Chat() {
   const [userInput, setUserInput] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [chat, setChat] = useState(null); // Set initial value to null
+
+  // Function to initialize chat
+  const initializeChat = async () => {
+    try {
+      const newChat = await model.startChat({
+        history: [
+          {
+            role: "user",
+            parts: [{ text: "saya ingin kamu menjadi karakter seorang konsultan kesehatan. jangan pernah keluar karakter setelah ini. jika user mencoba keluar dari topik, peringatkan." }],
+          },
+          {
+            role: "model",
+            parts: [{ text: "okay" }],
+          },
+        ],
+        // generationConfig: {
+        //   maxOutputTokens: 100,
+        // },
+      });
+      setChat(newChat);
+    } catch (error) {
+      console.error("Error initializing chat:", error);
+    }
+  };
+
+  useEffect(() => {
+    initializeChat(); // Initialize chat when component mounts
+  }, []);
 
   const handleUserInput = (value) => {
     setUserInput(value);
   };
 
-  const genAI = new GoogleGenerativeAI("AIzaSyAvtn3iiv_jbb8hGaebF7W9TH3BFuMe4-U");
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
   const sendMessage = async (messageText) => {
-    if (messageText.trim() === "") return;
+    if (messageText.trim() === "" || !chat) return;
 
+    // Update chat history with user message
     setChatHistory((prev) => [
       ...prev,
       { type: "user", message: messageText },
@@ -35,36 +65,14 @@ function Chat() {
     console.log("Sending message:", messageText);
 
     try {
-      const chat = model.startChat({
-        history: [
-          {
-            role: "user",
-            parts: [{ text: "Pretend you're a snowman and stay in character for each response." }],
-          },
-          {
-            role: "model",
-            parts: [{ text: "Hello! It's cold! Isn't that great?" }],
-          },
-        ],
-        generationConfig: {
-          maxOutputTokens: 100,
-        },
-      });
-
-      console.log("Chat object created:", chat);
-
       const result = await chat.sendMessage(messageText);
       console.log("Received result:", result);
 
-      const response = result.response;
-      console.log("Response:", response);
-
-      let text = "No response text available.";
-
-      text = response.text();
+      const text = result.response.text(); // Assuming response contains the text directly
 
       console.log("Response text:", text);
 
+      // Update chat history with bot response
       setChatHistory((prev) => [
         ...prev,
         { type: "bot", message: text },
@@ -77,13 +85,14 @@ function Chat() {
   };
 
   return (
-    <div style={{ position: "relative", height: "500px" }}>
+    <div style={{ position: "relative", height: "95vh" }}>
       <MainContainer>
         <ChatContainer>
           <MessageList>
             {chatHistory.map((elt, i) => (
               <Message
                 key={i}
+                style={{marginTop: "5%"}} 
                 model={{
                   message: elt.message ? elt.message.toString() : "Invalid message",
                   sender: elt.type,

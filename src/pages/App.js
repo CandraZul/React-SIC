@@ -68,28 +68,46 @@ const App = () => {
       // setConnected(true);
 
       // Start reading data
+      const readCharacteristicValue = async (characteristic) => {
+        try {
+          const value = await characteristic.readValue();
+          const buffer = value.buffer;
+          const dataView = new DataView(buffer);
+      
+          // Check if buffer length is sufficient for Uint16
+          if (buffer.byteLength < 2) {
+            throw new Error('Buffer too short');
+          }
+      
+          return dataView.getUint16(0, true); // Read Uint16 value
+        } catch (error) {
+          console.error('Error reading characteristic value:', error);
+          return null;
+        }
+      };
+      
       setInterval(async () => {
-        const bpmValue = await bpmCharacteristic.readValue();
-        const spo2Value = await spo2Characteristic.readValue();
+        const bpmValue = await readCharacteristicValue(bpmCharacteristic);
+        const spo2Value = await readCharacteristicValue(spo2Characteristic);
         const tempValue = await tempCharacteristic.readValue();
-
-        const bpm = new DataView(bpmValue.buffer).getUint16(0, true);
-        const spo2 = new DataView(spo2Value.buffer).getUint16(0, true);
-        const temp = new Float32Array(tempValue.buffer)[0];
-
+      
+        const bpm = bpmValue !== null ? bpmValue : 0;
+        const spo2 = spo2Value !== null ? spo2Value : 0;
+        const temp = new Float32Array(tempValue.buffer)[0]; // Ensure temp value reading is correct
+      
         setBpm(bpm);
         setSpo2(spo2);
         setTemp(temp);
-
+      
         const scaledData = scaleData([bpm, temp, spo2]);
         const inputData = tf.tensor2d([scaledData], [1, scaledData.length]);
         const prediction = mlModel.predict(inputData);
         const predClass = (await prediction.argMax(1).data())[0];
         const status = predClass === 0 ? 'Sehat' : predClass === 1 ? 'Sakit Ringan' : 'Sakit Parah';
-
+      
         setHealthStatus(status);
-
       }, 1000);
+      
     } catch (error) {
       console.error('Failed to connect or read data:', error);
       // setConnected(false);
@@ -116,80 +134,88 @@ const App = () => {
     <div>
       <header></header>
       <main>
-        <button onClick={connectToDevice} class="bg-radius b-view" >Connect to Device</button>
-          <article class="d-flex no-wrap" id="iot-value">
-              <section class="d-flex card-iot">
-                  <div class="circles">
-                      <div class="circle small"></div>
-                      <div class="circle large"></div>
-                  </div>
-                  <div class="special-respon">
-                      <span class="material-symbols-outlined">ecg_heart</span>
-                      <h3>Detak Jantung Per Menit</h3>
-                      <h1>{bpm}</h1>
-                  </div>
-              </section>
-              <section class="d-flex card-iot">
-                  <div class="circles">
-                      <div class="circle small"></div>
-                      <div class="circle large"></div>
-                  </div>
-                  <div class="special-respon">
-                      <span class="material-symbols-outlined">spo2</span>
-                      <h3>Saturasi Oksigen</h3>
-                      <h1>{spo2}</h1>
-                  </div>
-              </section>
-              <section class="d-flex card-iot">
-                  <div class="circles">
-                      <div class="circle small"></div>
-                      <div class="circle large"></div>
-                  </div>
-                  <div class="special-respon">
-                      <span class="material-symbols-outlined">thermostat</span>
-                      <h3>Temperature (C)</h3>
-                      <h1>{temp}</h1>
-                  </div>
-              </section>
-          </article>
-          <article class="d-flex no-wrap" id="iot-value">
-            <section class="d-flex card-iot">
-                  <div class="circles">
-                      <div class="circle small"></div>
-                      <div class="circle large"></div>
-                  </div>
-                  <div class="special-respon">
-                      <span class="material-symbols-outlined">ecg_heart</span>
-                      <h3>Tingkat Kesehatan</h3>
-                      <h1>{healthStatus}</h1>
-                  </div>
-              </section>
-          </article>
-          <article id="input-container">
-              <section>
-                  <div id="form-gejala">
-                      <div class="d-flex special-respon">
-                          <label for="gejala-user" class="bg-radius bg-white"><i>Masukkan gejala yang kamu alami</i></label>
-                          <textarea value={symptoms} onChange={(e) => setSymptoms(e.target.value)} id="gejala-user" name="gejala-user" placeholder="Ketikkan gejalamu di sini..."  class="bg-radius bg-white" cols="50"></textarea>
-                      </div>
-                      <button onClick={() => generateRecommendation(bpm, spo2, temp, symptoms)} class="bg-radius">BERIKAN SARAN</button>
-                      <p>{generateStatus}</p>
-                  </div>
-              </section>
-          </article>
-          <article id="ai-result">
-              <section id="ai-result-title" class="d-flex">
-                  <div class="d-flex" id="triple-circle">
-                      <div class="circle cc-color"></div>
-                      <div class="circle cc-color"></div>
-                      <div class="circle cc-color"></div>
-                  </div>
-                  <div class="title bg-white">
-                      <p>Hasil</p>
-                  </div>
-              </section>
-              <section id="ai-result-text" class="bg-radius bg-white" dangerouslySetInnerHTML={{ __html: recommendation }} ></section>
-          </article>
+        <button onClick={connectToDevice} className="bg-radius b-view">Connect to Device</button>
+        <article className="d-flex no-wrap" id="iot-value">
+          <section className="d-flex card-iot">
+            <div className="circles">
+              <div className="circle small"></div>
+              <div className="circle large"></div>
+            </div>
+            <div className="special-respon">
+              <span className="material-symbols-outlined">ecg_heart</span>
+              <h3>Detak Jantung Per Menit</h3>
+              <h1>{bpm}</h1>
+            </div>
+          </section>
+          <section className="d-flex card-iot">
+            <div className="circles">
+              <div className="circle small"></div>
+              <div className="circle large"></div>
+            </div>
+            <div className="special-respon">
+              <span className="material-symbols-outlined">spo2</span>
+              <h3>Saturasi Oksigen</h3>
+              <h1>{spo2}</h1>
+            </div>
+          </section>
+          <section className="d-flex card-iot">
+            <div className="circles">
+              <div className="circle small"></div>
+              <div className="circle large"></div>
+            </div>
+            <div className="special-respon">
+              <span className="material-symbols-outlined">thermostat</span>
+              <h3>Temperature (C)</h3>
+              <h1>{temp}</h1>
+            </div>
+          </section>
+        </article>
+        <article className="d-flex no-wrap" id="iot-value">
+          <section className="d-flex card-iot">
+            <div className="circles">
+              <div className="circle small"></div>
+              <div className="circle large"></div>
+            </div>
+            <div className="special-respon">
+              <span className="material-symbols-outlined">ecg_heart</span>
+              <h3>Tingkat Kesehatan</h3>
+              <h1>{healthStatus}</h1>
+            </div>
+          </section>
+        </article>
+        <article id="input-container">
+          <section>
+            <div id="form-gejala">
+              <div className="d-flex special-respon">
+                <label htmlFor="gejala-user" className="bg-radius bg-white"><i>Masukkan gejala yang kamu alami</i></label>
+                <textarea 
+                  value={symptoms} 
+                  onChange={(e) => setSymptoms(e.target.value)} 
+                  id="gejala-user" 
+                  name="gejala-user" 
+                  placeholder="Ketikkan gejalamu di sini..."  
+                  className="bg-radius bg-white" 
+                  cols="50">
+                </textarea>
+              </div>
+              <button onClick={() => generateRecommendation(bpm, spo2, temp, symptoms)} className="bg-radius">BERIKAN SARAN</button>
+              <p>{generateStatus}</p>
+            </div>
+          </section>
+        </article>
+        <article id="ai-result">
+          <section id="ai-result-title" className="d-flex">
+            <div className="d-flex" id="triple-circle">
+              <div className="circle cc-color"></div>
+              <div className="circle cc-color"></div>
+              <div className="circle cc-color"></div>
+            </div>
+            <div className="title bg-white">
+              <p>Hasil</p>
+            </div>
+          </section>
+          <section id="ai-result-text" className="bg-radius bg-white" dangerouslySetInnerHTML={{ __html: recommendation }}></section>
+        </article>
       </main>
       <footer></footer>
     </div>
