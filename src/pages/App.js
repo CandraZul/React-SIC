@@ -25,14 +25,14 @@ const SPO2_CHARACTERISTIC = '19b10002-e8f2-537e-4f6c-d104768a1214';
 const TEMP_CHARACTERISTIC = '19b10003-e8f2-537e-4f6c-d104768a1214';
 
 const App = () => {
-  const [connected, setConnected] = useState(false);
+  // const [connected, setConnected] = useState(false);
   const [bpm, setBpm] = useState(0);
   const [spo2, setSpo2] = useState(0);
   const [temp, setTemp] = useState(0);
   const [healthStatus, setHealthStatus] = useState("-");
-  const [averageBpm, setAverageBpm] = useState(0);
-  const [averageSpo2, setAverageSpo2] = useState(0);
-  const [averageTemp, setAverageTemp] = useState(0);
+  // const [averageBpm, setAverageBpm] = useState(0);
+  // const [averageSpo2, setAverageSpo2] = useState(0);
+  // const [averageTemp, setAverageTemp] = useState(0);
   const [symptoms, setSymptoms] = useState("");
   const [recommendation, setRecommendation] = useState(""); // Tambahkan state baru untuk rekomendasi
 
@@ -65,7 +65,7 @@ const App = () => {
       const spo2Characteristic = await service.getCharacteristic(SPO2_CHARACTERISTIC);
       const tempCharacteristic = await service.getCharacteristic(TEMP_CHARACTERISTIC);
 
-      setConnected(true);
+      // setConnected(true);
 
       // Start reading data
       setInterval(async () => {
@@ -92,7 +92,7 @@ const App = () => {
       }, 1000);
     } catch (error) {
       console.error('Failed to connect or read data:', error);
-      setConnected(false);
+      // setConnected(false);
     }
   };
 
