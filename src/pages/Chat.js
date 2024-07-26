@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import styles from "@chatscope/chat-ui-kit-styles/dist/default/styles.min.css";
+
 import {
   MainContainer,
   ChatContainer,
@@ -86,6 +87,9 @@ function Chat() {
 
   return (
     <div style={{ position: "relative", height: "95vh" }}>
+      <nav>
+        <a href="/" className="chat-nav bg-radius">Monitoring</a>
+      </nav>
       <MainContainer>
         <ChatContainer>
           <MessageList>

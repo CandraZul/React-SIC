@@ -17,6 +17,23 @@ body {
     /* background: linear-gradient(to bottom right, var(--cream), #DAE4FF, var(--cream), #EADAFF, #F3E3EF, var(--cream)); */
 }
 
+.chat-nav{
+    text-decoration: none;
+    background-color: #c6e3fa;
+    color: #7b8d9b;
+}
+
+.no-underline {
+    text-decoration: none;
+    background: linear-gradient(to right, var(--orange), var(--kuning));
+    text-transform: uppercase;
+    margin-top: 5%; 
+    margin-left: 5%;
+    font-weight: bold;
+    color: white;
+    border: none;
+  }
+
 .b-view {
     background: linear-gradient(to right, var(--biru), var(--ungu));
     text-transform: uppercase;

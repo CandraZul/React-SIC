@@ -132,9 +132,13 @@ const App = () => {
 
   return (
     <div>
-      <header></header>
+      <header>
+        <nav>
+          <a href="/chat" className="bg-radius no-underline" >Chat</a>
+          <button onClick={connectToDevice} className="bg-radius b-view">Connect to Device</button>
+        </nav>
+      </header>
       <main>
-        <button onClick={connectToDevice} className="bg-radius b-view">Connect to Device</button>
         <article className="d-flex no-wrap" id="iot-value">
           <section className="d-flex card-iot">
             <div className="circles">
